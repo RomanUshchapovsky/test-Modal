@@ -14,7 +14,8 @@
     "web-vitals": "^1.1.1",
     "formik": "^2.2.6",
     "papaparse": "^5.1.1",
-    "xlsx": "^0.16.9"
+    "xlsx": "^0.16.9",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "react-scripts start",
