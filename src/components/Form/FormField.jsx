@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import XLSX from 'xlsx';
 import Papa from 'papaparse';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FieldArray } from 'formik';
 import {
   CssBaseline,
   TextField,
@@ -10,20 +10,15 @@ import {
   Button,
 } from '@material-ui/core';
 
-import { FormValidation } from "../constants/index";
-import { FORM_HELP_TEXT } from "../constants/messages";
 import useStyles from './styles';
-
+import styles from './FormField.module.css'
 
 const EXTENSIONS = ['xlsx', 'xls', 'csv']
 
 const FormField = () => {
   const classes = useStyles();
-
   const [titles, setTitles] = useState([])
   const [restData, setRestData] = useState([])
-  // console.log('title===>>>', restData)
-  const [state, setFieldValue] = useState()
 
   // =======import excel=========
   const getExention = (file) => {
@@ -34,7 +29,6 @@ const FormField = () => {
   const importExcel = (e, cb) => {
     const file = e.target.files[0]
     const reader = new FileReader()
-    // setFileData(file)
 
     reader.onload = (event) => {
       //parse data
@@ -49,13 +43,12 @@ const FormField = () => {
       const fileInCSVFormt = XLSX.utils.sheet_to_csv(workSheet, { header: 1 });
       const fileData = Papa.parse(fileInCSVFormt).data;
 
-      console.log("data", fileData)
-
+      // console.log("data", fileData)
       const [titlesArray, ...restDataArray] = fileData
       setTitles((prev) => [...prev, ...titlesArray])
       setRestData((prev) => [...prev, ...restDataArray])
-      // cb("file", fileData, false)
 
+      cb("file", fileData, false)
     }
     if (file) {
       if (getExention(file)) {
@@ -65,8 +58,7 @@ const FormField = () => {
       }
     }
   }
-  // ===============================================================
-
+  // =======================================================
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -74,11 +66,17 @@ const FormField = () => {
         <Typography component="h1" variant="h5">
           Transition modal
         </Typography>
-
         <Formik
-          initialValues={{ firstName: "", lastName: "" }}
+          initialValues={{
+            firstName: "",
+            lastName: "",
+            file: [],
+            selected: '',
+            titles: !!titles.length && !!restData.length && titles.map((title, idx) => ({ [title]: restData[0][idx] }))
+            // titles: null,
+          }}
+          enableReinitialize
           onSubmit={(values) => console.log("Person", values)}
-          validationSchema={FormValidation.FIELD_ITEM.VALIDATION}
         >
           {(props) => {
             const {
@@ -86,34 +84,16 @@ const FormField = () => {
               isSubmitting,
               handleChange,
               handleBlur,
-              handleSubmit
+              handleSubmit,
+              setFieldValue
             } = props;
             return (
               <Form className={classes.form} onSubmit={handleSubmit}>
-                {/* <label>name</label>
-                <Field
-                  name="firstName"
-                  type="text"
-                  placeholder={FORM_HELP_TEXT.placeholder.text}
-                  value={values.firstName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                /> 
-
-                <label >surname</label> *
-                 <Field
-                  name="lastName"
-                  type="text"
-                  placeholder="Enter your surname"
-                  value={values.lastName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                /> */}
                 <TextField
                   name="firstName"
                   label="name"
                   type="text"
-                  placeholder={FORM_HELP_TEXT.placeholder.text}
+                  placeholder="Enter your name"
                   value={values.firstName}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -123,7 +103,6 @@ const FormField = () => {
                   fullWidth
                   autoFocus
                 >
-                  <Field />
                 </ TextField>
                 <TextField
                   name="lastName"
@@ -138,42 +117,77 @@ const FormField = () => {
                   required
                   fullWidth
                 >
-                  <Field />
                 </ TextField>
-                <input type="file" onChange={importExcel} />
+                {/* === Choose file ===== */}
+                <input
+                  id="file"
+                  name="file"
+                  type="file"
+                  onChange={(event) => {
+                    importExcel(event, setFieldValue)
+                  }} className="form-control"
+                />
+                {/* ======Table this data from excel */}
+                <div className={styles.tableBlock}>
+                  <Typography component="h4" variant="h5">
+                    Your Document:
+                  </Typography>
 
-                {/* <Field type="file" onChange={(e) => {
-                  importExcel(e, props.setFieldValue)
-                }} /> */}
-                <Typography component="h4" >
-                  Your Document:
-                </Typography>
+                  <FieldArray name="file">
+                    {() => (
+                      <div>
+                        {!!values.titles.length &&
+                          values.titles.slice(0, 5).map((titles, index) => {
+                            return (
+                              <div key={index}>
+                                <div className={styles.arrayBlock}>
+                                  <div className={styles.labelBlock}>
+                                    <label
+                                      className={styles.labelItem}
+                                      htmlFor={`titles.${index}.${Object.keys(titles)[0]}`}
+                                    > <b>{Object.keys(titles)[0]}</b>
+                                    </label>
+                                  </div>
 
-                <table >
-                  {!!restData.length && titles.slice(0, 5).map((title, idx, id) => <thead>
-                    <tr>
-                      <th key={title}>{title}</th>
-                      <th key={idx}>{restData[0][idx]}</th>
-                      <th key={id}>
-                        <select>
-                          <option>Пункт 1</option>
-                          <option>Пункт 2</option>
-                          <option>Пункт 3</option>
-                          <option>Пункт 4</option>
-                        </select>
-                      </th>
-                    </tr>
-                  </thead>)}
-                  {/*{titles.map((title, idx) => <tr><th>{title}</th>{restData.map(i=><th>{i[idx]}</th>)}</tr>)}*/}
-                </table>
-
-                <Button
-                  disabled={isSubmitting}
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                > Confirm
-                </Button>
+                                  <div>
+                                    <Field
+                                      className={styles.dataField}
+                                      name={`titles.${index}.${Object.keys(titles)[0]}`}
+                                      type="text"
+                                    />
+                                  </div>
+                                  <div>
+                                    <select
+                                      className={styles.selectButton}
+                                      name="selected"
+                                      value={values.selected}
+                                      onChange={handleChange}
+                                      onBlur={handleBlur}
+                                    >
+                                      <option value="" label="data type" />
+                                      <option value="integer" label="integer" />
+                                      <option value="string" label="string" />
+                                      <option value="data" label="data" />
+                                      <option value="float" label="float" />
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                      </div>
+                    )}
+                  </FieldArray>
+                </div>
+                <div className={styles.tableButton}>
+                  <Button
+                    disabled={isSubmitting}
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                  > Confirm
+                  </Button>
+                </div>
               </Form>
             );
           }}

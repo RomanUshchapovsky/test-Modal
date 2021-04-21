@@ -1,0 +1,40 @@
+.arrayBlock {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    position: relative;
+}
+.tableBlock {
+    display: inline-block;
+    width: 500px;
+    margin-top: 20px;
+    padding-left: 15px;
+    padding-bottom: 20px;
+    background-color: rgb(164, 226, 211);
+}
+.labelBlock {
+    width: 100px;
+}
+.labelItem{
+    display: inline-block;
+    margin-top: 17px;
+}
+.dataField {
+    display: flex;
+    margin-top: 17px;
+    overflow: hidden;
+    border: none;
+    background-color: rgb(164, 226, 211);
+}
+.selectButton {
+    margin-left: 20px;
+    margin-top: 15px;
+    height: 25px;
+    width: 80px;
+    border-radius: 30px;
+    outline:none;
+    background-color: #fff;
+}
+.tableButton {
+    margin-top: 30px;
+}

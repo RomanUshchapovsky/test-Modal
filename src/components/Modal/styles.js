@@ -9,13 +9,14 @@ const useStyles = makeStyles((theme) => ({
     },
     paper: {
       backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
+      borderRadius: '20px',
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
+      outline: 'none',
     },
     button: {
-      marginTop: "200px",
-    }
+      marginTop: "300px",
+    },
   }));
 
 export default useStyles;
