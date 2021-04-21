@@ -4,6 +4,6 @@ export const MSG = {
   
   export const FORM_HELP_TEXT = {
     placeholder: {
-      text: "Write your name",
+      text: "Enter your name",
     },
   };

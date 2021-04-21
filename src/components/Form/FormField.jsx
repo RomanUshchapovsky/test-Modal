@@ -10,7 +10,6 @@ import {
   Button,
 } from '@material-ui/core';
 
-
 import { FormValidation } from "../constants/index";
 import { FORM_HELP_TEXT } from "../constants/messages";
 import useStyles from './styles';
@@ -20,8 +19,11 @@ const EXTENSIONS = ['xlsx', 'xls', 'csv']
 
 const FormField = () => {
   const classes = useStyles();
-  const [data, setFileData] = useState()
-  // const [state, setFieldValue] = useState()
+
+  const [titles, setTitles] = useState([])
+  const [restData, setRestData] = useState([])
+  // console.log('title===>>>', restData)
+  const [state, setFieldValue] = useState()
 
   // =======import excel=========
   const getExention = (file) => {
@@ -30,10 +32,9 @@ const FormField = () => {
     return EXTENSIONS.includes(extension) // return boolean
   }
   const importExcel = (e, cb) => {
-
     const file = e.target.files[0]
     const reader = new FileReader()
-    setFileData(file)
+    // setFileData(file)
 
     reader.onload = (event) => {
       //parse data
@@ -50,19 +51,22 @@ const FormField = () => {
 
       console.log("data", fileData)
 
+      const [titlesArray, ...restDataArray] = fileData
+      setTitles((prev) => [...prev, ...titlesArray])
+      setRestData((prev) => [...prev, ...restDataArray])
       // cb("file", fileData, false)
 
     }
     if (file) {
       if (getExention(file)) {
         reader.readAsBinaryString(file)
-      }
-      else {
+      } else {
         alert("Invalid file input, Select Excel, CSV file")
       }
     }
   }
   // ===============================================================
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -72,91 +76,104 @@ const FormField = () => {
         </Typography>
 
         <Formik
-          initialState={{
-            file: null,
-            firstName: "name",
-            lastName: "name"
-          }}
+          initialValues={{ firstName: "", lastName: "" }}
+          onSubmit={(values) => console.log("Person", values)}
           validationSchema={FormValidation.FIELD_ITEM.VALIDATION}
         >
           {(props) => {
+            const {
+              values,
+              isSubmitting,
+              handleChange,
+              handleBlur,
+              handleSubmit
+            } = props;
             return (
-              <Form className={classes.form}>
+              <Form className={classes.form} onSubmit={handleSubmit}>
+                {/* <label>name</label>
+                <Field
+                  name="firstName"
+                  type="text"
+                  placeholder={FORM_HELP_TEXT.placeholder.text}
+                  value={values.firstName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                /> 
 
-                <Field name="firstName">
-                  {({
-                    field, // { name, value, onChange, onBlur }
-                    form: { values, }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                    meta,
-                  }) => (
-                    <div>Name
-                      <input type="text"
-                        placeholder={FORM_HELP_TEXT.placeholder.text}
-                        {...field} />
-                    </div>
-                  )}
-                </Field>
-                <Field name="lastName">
-                  {({
-                    field, // { name, value, onChange, onBlur }
-                    form: { values, }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                    meta,
-                  }) => (
-                    <div>Surname
-                      <input type="text"
-                        placeholder="Surname"
-                        {...field} />
-                    </div>
-                  )}
-                </Field>
-                {/* <TextField
+                <label >surname</label> *
+                 <Field
+                  name="lastName"
+                  type="text"
+                  placeholder="Enter your surname"
+                  value={values.lastName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                /> */}
+                <TextField
+                  name="firstName"
+                  label="name"
+                  type="text"
+                  placeholder={FORM_HELP_TEXT.placeholder.text}
+                  value={values.firstName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                   variant="outlined"
                   margin="normal"
                   required
                   fullWidth
-                  id=""
-                  label="name"
-                  type="text"
-                  name="text"
-                  placeholder={FORM_HELP_TEXT.placeholder.text}
                   autoFocus
                 >
                   <Field />
-                </ TextField> */}
-                {/* <TextField
+                </ TextField>
+                <TextField
+                  name="lastName"
+                  type="text"
+                  label="Surname"
+                  placeholder="Enter your surname"
+                  value={values.lastName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
                   variant="outlined"
                   margin="normal"
                   required
                   fullWidth
-                  name="text"
-                  label="Surname"
-                  type="text"
-                  id=""
-                  placeholder={FORM_HELP_TEXT.placeholder.text}
                 >
                   <Field />
-                </ TextField> */}
-                {/* <input type="file" onChange={importExcel} /> */}
+                </ TextField>
+                <input type="file" onChange={importExcel} />
 
-                <Field type="file" onChange={(e) => {
+                {/* <Field type="file" onChange={(e) => {
                   importExcel(e, props.setFieldValue)
-                }} />
-                <div>
-                  <Field />
-                  <Field />
+                }} /> */}
+                <Typography component="h4" >
+                  Your Document:
+                </Typography>
 
-                  <Field as="select"
-                    name="data"
-                  // onChange={props}
-                  >
-                    <option value="">Red</option>
-                    <option value="">Green</option>
-                    <option value="">Blue</option>
-                    <option value="">Some</option>
-                  </Field>
-                </div>
+                <table >
+                  {!!restData.length && titles.slice(0, 5).map((title, idx, id) => <thead>
+                    <tr>
+                      <th key={title}>{title}</th>
+                      <th key={idx}>{restData[0][idx]}</th>
+                      <th key={id}>
+                        <select>
+                          <option>Пункт 1</option>
+                          <option>Пункт 2</option>
+                          <option>Пункт 3</option>
+                          <option>Пункт 4</option>
+                        </select>
+                      </th>
+                    </tr>
+                  </thead>)}
+                  {/*{titles.map((title, idx) => <tr><th>{title}</th>{restData.map(i=><th>{i[idx]}</th>)}</tr>)}*/}
+                </table>
 
-                <Button type="submit" variant="contained" color="primary">confirm</Button>
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                > Confirm
+                </Button>
               </Form>
             );
           }}
