@@ -9,7 +9,6 @@ import {
 import useStyles from './styles';
 import FormField from '../Form/FormField';
 
-
 const ModalWindow = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);

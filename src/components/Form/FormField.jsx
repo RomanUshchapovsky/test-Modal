@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { Formik, Form, Field, FieldArray } from 'formik';
@@ -17,8 +17,6 @@ const EXTENSIONS = ['xlsx', 'xls', 'csv']
 
 const FormField = () => {
   const classes = useStyles();
-  const [titles, setTitles] = useState([])
-  const [restData, setRestData] = useState([])
 
   // =======import excel=========
   const getExention = (file) => {
@@ -39,16 +37,13 @@ const FormField = () => {
       const workSheet = workBook.Sheets[workSheetName]
       //convert to array
       // const fileData = XLSX.utils.sheet_to_json(workSheet, { header: 1 })
-
       const fileInCSVFormt = XLSX.utils.sheet_to_csv(workSheet, { header: 1 });
       const fileData = Papa.parse(fileInCSVFormt).data;
 
-      // console.log("data", fileData)
       const [titlesArray, ...restDataArray] = fileData
-      setTitles((prev) => [...prev, ...titlesArray])
-      setRestData((prev) => [...prev, ...restDataArray])
+      const data = titlesArray.map((title, idx) => ({ [title]: restDataArray[0][idx] }))
+      cb("data", data)
 
-      cb("file", fileData, false)
     }
     if (file) {
       if (getExention(file)) {
@@ -59,6 +54,9 @@ const FormField = () => {
     }
   }
   // =======================================================
+  // const resultData = () => {
+
+  // }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -70,10 +68,8 @@ const FormField = () => {
           initialValues={{
             firstName: "",
             lastName: "",
-            file: [],
+            data: [],
             selected: '',
-            titles: !!titles.length && !!restData.length && titles.map((title, idx) => ({ [title]: restData[0][idx] }))
-            // titles: null,
           }}
           enableReinitialize
           onSubmit={(values) => console.log("Person", values)}
@@ -87,6 +83,7 @@ const FormField = () => {
               handleSubmit,
               setFieldValue
             } = props;
+            // console.log('values', values)
             return (
               <Form className={classes.form} onSubmit={handleSubmit}>
                 <TextField
@@ -119,40 +116,46 @@ const FormField = () => {
                 >
                 </ TextField>
                 {/* === Choose file ===== */}
-                <input
+                <label className={styles.lableInput} htmlFor="file">Choose file</label>
+                <p  htmlFor="file">{values.file}</p>
+                <Field
+                  className={styles.fileInput}
                   id="file"
                   name="file"
                   type="file"
+                  hidden
                   onChange={(event) => {
                     importExcel(event, setFieldValue)
-                  }} className="form-control"
+                  }}
                 />
-                {/* ======Table this data from excel */}
+                {/* ======Table with data from excel */}
                 <div className={styles.tableBlock}>
                   <Typography component="h4" variant="h5">
                     Your Document:
                   </Typography>
 
                   <FieldArray name="file">
-                    {() => (
+                    {({ insert, remove, push })  => (
                       <div>
-                        {!!values.titles.length &&
-                          values.titles.slice(0, 5).map((titles, index) => {
+                        {!!values.data.length &&
+                          values.data.slice(0, 5).map((titles, index) => {
+                            // console.log('----', titles, values.data);
                             return (
                               <div key={index}>
                                 <div className={styles.arrayBlock}>
                                   <div className={styles.labelBlock}>
                                     <label
                                       className={styles.labelItem}
-                                      htmlFor={`titles.${index}.${Object.keys(titles)[0]}`}
-                                    > <b>{Object.keys(titles)[0]}</b>
+                                      // htmlFor={`data.${index}.${Object.keys(titles)[0]}`}
+                                    >
+                                      <b>{Object.keys(titles)[0]}</b>
+                                      {/* <b>{`data.${index}.${Object.keys(titles)[0]}`}</b> */}
                                     </label>
                                   </div>
-
                                   <div>
                                     <Field
                                       className={styles.dataField}
-                                      name={`titles.${index}.${Object.keys(titles)[0]}`}
+                                      name={`data.${index}.${Object.keys(titles)[0]}`}
                                       type="text"
                                     />
                                   </div>
@@ -162,7 +165,9 @@ const FormField = () => {
                                       name="selected"
                                       value={values.selected}
                                       onChange={handleChange}
+                                      // onChange={setFieldValue}
                                       onBlur={handleBlur}
+                                      onClick={() => values.data.push({ name:''})}
                                     >
                                       <option value="" label="data type" />
                                       <option value="integer" label="integer" />
