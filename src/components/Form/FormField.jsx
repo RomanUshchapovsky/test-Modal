@@ -54,9 +54,8 @@ const FormField = () => {
     }
   }
   // =======================================================
-  // const resultData = () => {
+  // const resultData = data
 
-  // }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
