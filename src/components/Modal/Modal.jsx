@@ -8,6 +8,7 @@ import {
 
 import useStyles from './styles';
 import FormField from '../Form/FormField';
+// import FormField2 from '../Form/form';
 
 const ModalWindow = () => {
   const classes = useStyles();
@@ -43,6 +44,7 @@ const ModalWindow = () => {
         <Fade in={open}>
           <div className={classes.paper}>
             <FormField />
+            {/* <FormField2 /> */}
           </div>
         </Fade>
       </Modal>
