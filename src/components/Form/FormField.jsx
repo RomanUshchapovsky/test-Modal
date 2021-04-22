@@ -192,6 +192,13 @@ const FormField = () => {
                     color="primary"
                   > Confirm
                   </Button>
+
+                  <Button                  
+                    type="reset"
+                    variant="contained"
+                    color="secondary"
+                  > Reset
+                  </Button>
                 </div>
               </Form>
             );
