@@ -1,14 +1,14 @@
 import React from 'react';
 import './App.css';
-import ModalWindow from './components/Modal/Modal';
+import ModalWindow from './components/Modal/Modal'
 
 
-function App() {
-  return (
+const App: React.FC = () => {
+  return <>
     <div className="App">
       <ModalWindow />
     </div>
-  );
+  </>
 }
 
 export default App;

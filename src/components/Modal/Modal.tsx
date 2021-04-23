@@ -7,10 +7,10 @@ import {
 } from '@material-ui/core';
 
 import useStyles from './styles';
-import FormField from '../Form/FormField';
+import FormField from '../Form/FormField'
 // import FormField2 from '../Form/form';
 
-const ModalWindow = () => {
+const ModalWindow: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
